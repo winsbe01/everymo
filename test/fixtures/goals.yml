@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  wordcount: 1
+  start_date: 2014-07-17
+  end_date: 2014-07-17
+  user_id: 
+
+two:
+  name: MyString
+  wordcount: 1
+  start_date: 2014-07-17
+  end_date: 2014-07-17
+  user_id: 

@@ -1,0 +1,49 @@
+<h1>User</h1>
+
+<p>
+	<strong>Username:</strong>
+	<%= @user.username %>
+</p>
+
+<p>
+	<strong>Email:</strong>
+	<%= @user.email %>
+</p>
+
+<h2>Goals</h2>
+<table>
+	<tr>
+		<th>Name</th>
+		<th>Goal Wordcount</th>
+		<th>Start date</th>
+		<th>End date</th>
+		<th>Active</th>
+		<th colspan="1"></th>
+	</tr>
+	
+	<% @user.goals.each do |goal| %>
+	<tr>
+		<td><%= link_to goal.name, user_goal_path(@user, goal.id) %></td>
+		<td><%= goal.goal_wordcount %></td>
+		<td><%= goal.start_date %></td>
+		<td><%= goal.end_date %></td>
+		<td>		
+			<% if goal.start_date <= Date.today and 
+					goal.end_date >= Date.today %>
+				Yes
+			<% else %>
+				No
+			<% end %>
+		</td>
+		<td><%= link_to 'Delete', user_goal_path(@user, goal.id),
+						method: :delete, data: { confirm:
+						'Deleting a goal is irreversible. Continue?' 
+						} %></td>
+	</tr>
+<% end %>
+
+</table><br>
+
+<%= link_to 'New Goal', new_user_goal_path(@user) %>
+
+<%= link_to 'All Users', users_path %>

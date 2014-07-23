@@ -1,0 +1,42 @@
+<h1><%= @goal.name %></h1>
+
+<p>
+	Goal: <%= @goal.goal_wordcount %> words<br>
+	Current: <%= @goal.current_wordcount %> words<br>
+	Start date: <%= @goal.start_date %><br>
+	End date: <%= @goal.end_date %>
+</p>
+
+<%= form_for :goal, url: user_goal_path(@user.id,@goal.id), method: :patch do |f| %>
+	<p>
+		<%= f.label :current_wordcount %><br>
+		
+		<!-- TODO: pull this logic into the model -->
+		<% if Date.today >= @goal.start_date and Date.today <= @goal.end_date %>
+			<%= f.text_field :current_wordcount %><br>
+			<%= f.submit %>
+		<% else %>
+			<%= f.text_field :current_wordcount, :disabled => true %>
+		<% end %>
+	</p>
+<% end %>
+
+<h2>Progress</h2>
+<table>
+	<tr>
+		<th>Day</th>
+		<th>Wordcount</th>
+	</tr>
+	
+	<% @goal.days.each do |day| %>
+		<% if day.date <= Date.today %>
+			<tr>
+				<td><%= day.date %></td>
+				<td><%= day.wordcount %></td>
+			</tr>
+		<% end %>
+	<% end %>
+</table>
+
+<%= link_to "Back to " + @user.username, user_path(@user.id) %>
+<%= link_to "Edit progress", user_goal_days_path(@user.id,@goal.id) %>

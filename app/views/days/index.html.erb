@@ -1,0 +1,11 @@
+<h1>Edit Day Values</h1>
+
+<% @days.each do |day| %>
+
+<%= form_for :day, url: user_goal_day_path(@user.id,@goal.id, day.id), method: :patch do |f| %>
+		<%= day.date %>: <%= f.text_field :wordcount, :value => day.wordcount %>
+		<%= f.submit %><br>
+	<% end %>
+<% end %>
+
+<%= link_to 'Back to ' + @goal.name, user_goal_path(@user, @goal) %>
