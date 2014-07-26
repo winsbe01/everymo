@@ -21,6 +21,8 @@
 	</p>
 <% end %>
 
+<br>
+
 <h2>Progress</h2>
 <table>
 	<tr>
@@ -37,6 +39,131 @@
 		<% end %>
 	<% end %>
 </table>
+
+<div id='words_by_day_graph'></div>
+
+<div id='donut_graph'></div>
+
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script>
+	//<![CDATA[
+	
+		google.load("visualization", "1", { packages: ["corechart"] });
+		
+		google.setOnLoadCallback(function() {
+		
+			var data = new google.visualization.DataTable();
+		
+			data.addColumn('string', 'Day');
+			data.addColumn('number', 'Words');
+			data.addColumn('number', 'Par');
+			
+			var goalData = <%= @day_data %>;
+			var dates = <%= raw @day_labels %>;
+			var parData = <%= @day_par %>;
+			
+			for (var i = 0; i <= goalData.length; i++) {
+				
+				data.addRow([ dates[i], goalData[i], parData[i]]);
+			}
+			
+	var chart = new google.visualization.ComboChart($('#words_by_day_graph')[0]);
+		
+	chart.draw(data, {
+        title: 'Words By Day',
+    
+        height: 375,
+    
+        backgroundColor: '#FFFFFF',
+    
+        chartArea: {
+          left: 100,
+          top: 10,
+          width: "70%",
+          height:"70%"
+        },
+    
+        vAxis: {
+          title: 'Words',
+          minValue: 0,
+          maxValue: <%= @goal.goal_wordcount %>
+        },
+    
+        series: {
+          0: {
+            type: 'bars'
+          },
+          1: {
+            type: 'line'
+          }
+        },
+    
+        colors: ['#674732','#BCBCBC'],
+    
+        legend: 'none',
+    
+        pointSize: 2
+      });
+    });
+
+	//]]>
+</script>
+
+<script>
+//<![CDATA[
+	
+		google.load("visualization", "1", { packages: ["corechart"] });
+		
+		google.setOnLoadCallback(function() {
+		
+			var data;
+			var options;
+		
+			var cur_wordcount = <%= @goal.current_wordcount %>
+			var goal_wordcount = <%= @goal.goal_wordcount %>
+			var cur_par = <%= @cur_par %>
+			
+			if ( cur_par > cur_wordcount ) {
+				data = google.visualization.arrayToDataTable([
+					['Type', 'Count'],
+					['Wordcount', cur_wordcount],
+					['Difference', cur_par - cur_wordcount],
+					['Remaining', goal_wordcount - cur_par]
+				]);
+				
+				options = {
+					title: 'Goal Progress',
+					pieHole: 0.45,
+					colors:['#66FF33','#FFFF66','#C2C2A3'],
+					tooltip:{text: 'value'},
+					pieSliceText: 'none'
+				};
+			} else {
+				data = google.visualization.arrayToDataTable([
+					['Type', 'Count'],
+					['Par', cur_par],
+					['Difference', cur_wordcount - cur_par],
+					['Remaining', goal_wordcount - cur_wordcount]
+				]);
+				
+				options = {
+					title: 'Goal Progress',
+					pieHole: 0.45,
+					colors:['#FFFF66','#66FF33','#C2C2A3'],
+					tooltip:{text: 'value'},
+					pieSliceText: 'none'
+				};
+			
+			}
+			
+			
+			var chart = new google.visualization.PieChart($('#donut_graph')[0]);
+			
+			chart.draw(data, options);
+    });
+
+	//]]>
+</script>
 
 <%= link_to "Back to " + @user.username, user_path(@user.id) %>
 <%= link_to "Edit progress", user_goal_days_path(@user.id,@goal.id) %>

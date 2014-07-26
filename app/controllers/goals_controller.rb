@@ -46,6 +46,45 @@ end
 def show
 	@user = User.find(params[:user_id])
 	@goal = Goal.find(params[:id])
+	@days = Day.where("goal_id = ?", @goal.id)
+	
+	@day_labels = []
+	@day_data = []
+	@day_par = []
+	
+	wpd = @goal.goal_wordcount / (@goal.end_date - @goal.start_date + 1)
+	
+	# calculation: current_wordcount + 
+	#(current_wordcount - total_wordcount) + 
+	#(par_wordcount - current_wordcount)
+	
+	count = 0
+	
+	@days.each do |u|
+	
+		# add the date label
+		@day_labels[count] = u.date.strftime('%Y-%m-%d')
+		
+		# add the the wordcount, if it's today or earlier
+		# else add zero
+		if u.date > Date.today
+			@day_data[count] = 0
+		else
+			@day_data[count] = u.wordcount
+		end
+		
+		# calculation: day# * number of words per day
+		@day_par[count] = ((count + 1) * wpd).floor
+		
+		# get the current par value
+		if u.date = Date.today
+			cur_day = count
+		end
+			
+		count += 1
+	end
+	
+	@cur_par = @day_par[@day_labels.index(Date.today.strftime('%Y-%m-%d'))]
 end
 
 def destroy
