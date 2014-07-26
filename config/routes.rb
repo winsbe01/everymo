@@ -34,8 +34,6 @@ Rails.application.routes.draw do
 		resources :days
 	end
   end
-  
-  resources :charts
 
   # Example resource route with more complex sub-resources:
   #   resources :products do
