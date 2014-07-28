@@ -57,14 +57,18 @@
 			data.addColumn('string', 'Day');
 			data.addColumn('number', 'Words');
 			data.addColumn('number', 'Par');
+			data.addColumn('number', 'Adjusted');
+			data.addColumn('number', 'Current Rate');
 			
-			var goalData = <%= @day_data %>;
-			var dates = <%= raw @day_labels %>;
-			var parData = <%= @day_par %>;
+			var goalData = <%= @g_user_data.to_json %>;
+			var dates = <%= raw @g_labels.to_json %>;
+			var parData = <%= @g_ideal_par.to_json %>;
+			
+			var adj = <%= @g_adj_par.to_json %>;
+			var cur_rate = <%= @g_cur_rate.to_json %>;
 			
 			for (var i = 0; i <= goalData.length; i++) {
-				
-				data.addRow([ dates[i], goalData[i], parData[i]]);
+				data.addRow([ dates[i], goalData[i], parData[i], adj[i], cur_rate[i] ]);
 			}
 			
 	var chart = new google.visualization.ComboChart($('#words_by_day_graph')[0]);
@@ -91,14 +95,27 @@
     
         series: {
           0: {
-            type: 'bars'
+            type: 'bars',
+			color: '#006600'
           },
           1: {
-            type: 'line'
-          }
+            type: 'line',
+			color: '#BCBCBC',
+			lineWidth: 1,
+			pointSize: 0
+          },
+		  2: {
+			type: 'line',
+			lineWidth: 0,
+			pointShape: 'triangle',
+			pointSize: 5,
+			color: '#890000'
+		  },
+		  3: {
+			type: 'line',
+			color: '#2EE1E9'
+		  }
         },
-    
-        colors: ['#674732','#BCBCBC'],
     
         legend: 'none',
     
@@ -117,45 +134,32 @@
 		google.setOnLoadCallback(function() {
 		
 			var data;
-			var options;
 		
 			var cur_wordcount = <%= @goal.current_wordcount %>
 			var goal_wordcount = <%= @goal.goal_wordcount %>
 			var cur_par = <%= @cur_par %>
 			
-			if ( cur_par > cur_wordcount ) {
+			if (cur_wordcount <= goal_wordcount) {
 				data = google.visualization.arrayToDataTable([
 					['Type', 'Count'],
 					['Wordcount', cur_wordcount],
-					['Difference', cur_par - cur_wordcount],
-					['Remaining', goal_wordcount - cur_par]
+					['Remaining', goal_wordcount - cur_wordcount]
 				]);
-				
-				options = {
-					title: 'Goal Progress',
-					pieHole: 0.45,
-					colors:['#66FF33','#FFFF66','#C2C2A3'],
-					tooltip:{text: 'value'},
-					pieSliceText: 'none'
-				};
 			} else {
 				data = google.visualization.arrayToDataTable([
 					['Type', 'Count'],
-					['Par', cur_par],
-					['Difference', cur_wordcount - cur_par],
-					['Remaining', goal_wordcount - cur_wordcount]
+					['Wordcount', cur_wordcount]
 				]);
-				
-				options = {
-					title: 'Goal Progress',
-					pieHole: 0.45,
-					colors:['#FFFF66','#66FF33','#C2C2A3'],
-					tooltip:{text: 'value'},
-					pieSliceText: 'none'
-				};
-			
 			}
-			
+				
+			var options = {
+				title: 'Goal Progress',
+				pieHole: 0.45,
+				colors:['#66FF33','#C2C2A3'],
+				tooltip:{text: 'value'},
+				pieSliceText: 'none',
+				legend: 'none'
+			};
 			
 			var chart = new google.visualization.PieChart($('#donut_graph')[0]);
 			
