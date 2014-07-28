@@ -48,11 +48,21 @@ def show
 	@goal = Goal.find(params[:id])
 	@days = Day.where("goal_id = ?", @goal.id)
 	
-	@day_labels = []
-	@day_data = []
-	@day_par = []
+	@g_labels = []
+	@g_user_data = []
+	@g_ideal_par = []
+	@g_adj_par = []
+	@g_cur_rate = []
 	
-	wpd = @goal.goal_wordcount / (@goal.end_date - @goal.start_date + 1)
+	ideal_wpd = @goal.goal_wordcount / (@goal.end_date - @goal.start_date + 1)
+	
+	if @goal.end_date >= Date.today and @goal.start_date <= Date.today
+		adj_wpd = (@goal.goal_wordcount - @goal.current_wordcount) / (@goal.end_date - Date.today)
+		cur_wpd = @goal.current_wordcount / (Date.today - @goal.start_date + 1)
+	end
+	
+	days_passed = Date.today - @goal.start_date
+	days_remaining = @goal.end_date - Date.today
 	
 	# calculation: current_wordcount + 
 	#(current_wordcount - total_wordcount) + 
@@ -63,18 +73,34 @@ def show
 	@days.each do |u|
 	
 		# add the date label
-		@day_labels[count] = u.date.strftime('%Y-%m-%d')
+		@g_labels[count] = u.date.strftime('%Y-%m-%d')
 		
 		# add the the wordcount, if it's today or earlier
 		# else add zero
 		if u.date > Date.today
-			@day_data[count] = 0
+			@g_user_data[count] = 0
+			
+			# adjusted par
+			# calculation: cur_wordcount + (current day# - days passed) * adjusted wpd
+			@g_adj_par[count] = @goal.current_wordcount + ((count - days_passed) * adj_wpd).floor
+			
+			# current rate
+			# calculation: cur_wordcount + (current day# - days passed) * current wpd
+			@g_cur_rate[count] = @goal.current_wordcount + ((count - days_passed) * cur_wpd).floor
+
 		else
-			@day_data[count] = u.wordcount
+			@g_user_data[count] = u.wordcount
 		end
 		
+		if count < days_passed
+			@g_adj_par[count] = nil
+			@g_cur_rate[count] = nil
+		end
+		
+		# ideal par
 		# calculation: day# * number of words per day
-		@day_par[count] = ((count + 1) * wpd).floor
+		@g_ideal_par[count] = ((count + 1) * ideal_wpd).floor
+		
 		
 		# get the current par value
 		if u.date = Date.today
@@ -84,7 +110,9 @@ def show
 		count += 1
 	end
 	
-	@cur_par = @day_par[@day_labels.index(Date.today.strftime('%Y-%m-%d'))]
+	if @goal.end_date >= Date.today and @goal.start_date <= Date.today
+		@cur_par = @g_ideal_par[@g_labels.index(Date.today.strftime('%Y-%m-%d'))]
+	end
 end
 
 def destroy
