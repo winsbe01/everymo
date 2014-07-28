@@ -8,6 +8,15 @@
 </head>
 <body>
 
+<h1><%= link_to "Everymo", root_path %></h1>
+
+<% if @current_user.nil? %>
+	<%= link_to "Login", login_path %>
+<% else %>	
+	Logged in as <strong><%= @current_user.username %></strong>
+	<%= button_to "Logout", :controller => "sessions", :action => "logout" %>
+<% end %>
+
 <%= yield %>
 
 </body>
