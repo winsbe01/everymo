@@ -9,7 +9,7 @@ class SessionsController < ApplicationController
 	authorized_user = User.authenticate(params[:username_or_email], params[:login_password])
 	if authorized_user
 		session[:user_id] = authorized_user.id
-		redirect_to(:action => 'home')
+		redirect_to user_path(authorized_user)
 	else
 		render "login"
 	end
@@ -26,6 +26,6 @@ class SessionsController < ApplicationController
   
   def logout
 	session[:user_id] = nil
-	redirect_to :action => 'login'
+	redirect_to login_path
   end
 end
