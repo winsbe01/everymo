@@ -18,6 +18,9 @@ def create
 	@user = User.new(user_params)
 	
 	if @user.save
+		
+		#TODO: log the new user in!
+	
 		redirect_to @user
 	else
 		render 'new'
