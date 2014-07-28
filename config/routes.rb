@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   post 'sessions/logout'
   
   # You can have the root of your site routed with "root"
-  root :to => 'sessions#login'
+  root :to => 'welcome#index'
   
   match 'signup', :to => 'users#new', via: [:get]
   match 'login', :to => 'sessions#login', via: [:get]
